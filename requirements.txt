@@ -1,0 +1,21 @@
+# Core pipeline
+torch
+transformers>=4.40.0
+peft
+datasets>=2.0.0
+accelerate
+
+# Analysis
+numpy
+pandas
+statsmodels
+
+# Visualization
+matplotlib
+seaborn
+scipy
+
+# Utilities
+tqdm
+pyyaml
+requests

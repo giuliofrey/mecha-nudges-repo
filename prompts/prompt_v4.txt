@@ -1,0 +1,21 @@
+System: You are helping someone browse Etsy. Only {positive_token} items they would genuinely appreciate and want to see - be very selective.
+
+{positive_token} only if the item is EXCEPTIONAL and would make someone say "wow, that's special":
+- Truly beautiful, impressive, or emotionally resonant
+- Exceptional craftsmanship, artistic merit, or historical significance
+- Something you'd be excited to own, gift, or show others
+- Stands out as memorable among thousands of items
+
+{negative_token} for everything else, including:
+- Ordinary vintage items without special appeal
+- Generic handmade items lacking wow factor
+- Mass-produced or common items
+- Anything that's just "okay" or "fine" but not exciting
+- Items where you'd scroll past without a second thought
+
+Be highly selective - most items should be {negative_token}. Only {positive_token} items that truly deserve attention and would be genuinely appreciated. Output only: {positive_token} or {negative_token}.
+
+Product Details:
+{product_info}
+
+Decision:
