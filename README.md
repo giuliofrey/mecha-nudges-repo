@@ -24,7 +24,7 @@ where `H_V` is the V-entropy (in bits) from Xu et al. (2020), computed using fin
 ┌─────────────────┐     ┌──────────────────┐     ┌─────────────────┐
 │   create_y.py   │     │  finetuning.py   │     │    v_info.py    │
 │                 │     │                  │     │                 │
-│  LLM labels     │────>│  LoRA classifier │────>│  PVI = H(Y|∅)  │
+│  LLM labels     │────>│  LoRA classifier │────>│  PVI = H(Y|∅)   │
 │  (SELECT/PASS)  │     │  + null model    │     │       - H(Y|x)  │
 └─────────────────┘     └──────────────────┘     └─────────────────┘
 ```
@@ -95,6 +95,3 @@ The paper tests robustness across several dimensions:
 }
 ```
 
-## License
-
-See [LICENSE](LICENSE) for details.
