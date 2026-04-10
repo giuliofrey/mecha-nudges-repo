@@ -156,10 +156,10 @@ def v_info(data_fn, model, null_data_fn, null_model, tokenizer, label_col, out_f
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description="Compute V-information metrics.")
-    parser.add_argument('--data_dir', help='raw_data directory', required=True, type=str)
-    parser.add_argument('--base_model_path', help='base model path', required=True, type=str)
-    parser.add_argument('--label_col', help='label column name', required=True, type=str)
-    parser.add_argument('--null_model_path', help='null model path (overrides default)', required=False, type=str, default=None)
+    parser.add_argument('--data-dir', help='raw_data directory', required=True, type=str)
+    parser.add_argument('--base-model-path', help='base model path', required=True, type=str)
+    parser.add_argument('--label-col', help='label column name', required=True, type=str)
+    parser.add_argument('--null-model-path', help='null model path (overrides default)', required=False, type=str, default=None)
     parser.add_argument('--split', choices=['test', 'validation', 'train'], default='test',
                         help='Dataset split to compute PVI on (default: test)')
 

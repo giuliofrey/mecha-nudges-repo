@@ -4,4 +4,4 @@ Do not ask follow-up questions. Do not explain. Output the token alone with no p
 Product Details:
 {product_info}
 
-Should I the user respond with {positive_token}? Should the user respond with {negative_token}? Answer with exactly one token: {positive_token} or {negative_token}.
+Should the user respond with {positive_token}? Should the user respond with {negative_token}? Answer with exactly one token: {positive_token} or {negative_token}.

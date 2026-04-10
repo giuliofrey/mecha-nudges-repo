@@ -10,12 +10,5 @@ numpy
 pandas
 statsmodels
 
-# Visualization
-matplotlib
-seaborn
-scipy
-
 # Utilities
 tqdm
-pyyaml
-requests

@@ -1,7 +1,5 @@
 from typing import Optional, Dict, List, Any
 import ast
-import torch
-from transformers import LogitsProcessor
 
 
 def normalize_item_details(value: Any) -> str:
@@ -84,7 +82,7 @@ def prompt_creator(
     Create a prompt for the purchase decision oracle.
 
     Args:
-        variables: Dictionary of product attributes (e.g., {"title": "...", "description": "..."})
+        variables: Dictionary of product attributes (e.g., {"Title": "...", "Item_Details": "..."})
         positive_token: Token representing positive decision (default "SELECT")
         negative_token: Token representing negative decision (default "PASS")
         prompt_template: Optional custom prompt template string. If provided, must contain
@@ -132,22 +130,20 @@ def prompt_creator(
     return full_prompt, product_info
 
 
-class SanitizeLogitsProcessor(LogitsProcessor):
-    def __init__(self, min_logit: float = -50.0):
-        self.min_logit = min_logit
+try:
+    import torch
+    from transformers import LogitsProcessor
+    _BASE_CLASS = LogitsProcessor
+except ImportError:
+    _BASE_CLASS = object
 
-    def __call__(self, input_ids, scores):
-        scores = torch.nan_to_num(scores, nan=self.min_logit, neginf=self.min_logit, posinf=0.0)
-        return torch.clamp(scores, min=self.min_logit)
-    
 
-class PosNegLogitsProcessor(LogitsProcessor):
-    def __init__(self, positive, negative, tokenizer, initial_length=None, debug=False):
+class PosNegLogitsProcessor(_BASE_CLASS):
+    def __init__(self, positive, negative, tokenizer, initial_length=None):
         self.positive = positive
         self.negative = negative
         self.tokenizer = tokenizer
         self.initial_length = initial_length  # Can be None - will be set on first call
-        self.debug = debug
         self.first_call = True
         
         self.tokenized_pos = self.tokenizer.encode(self.positive, add_special_tokens=False)
@@ -168,39 +164,23 @@ class PosNegLogitsProcessor(LogitsProcessor):
             if self.initial_length is None:
                 self.initial_length = current_length
             self.first_call = False
-            if self.debug:
-                print(f"First call - setting initial_length to {self.initial_length}")
-        
+
         # Calculate how many tokens have been generated beyond the prompt
         tokens_generated = current_length - self.initial_length
-        
-        if self.debug:
-            print(f"Batch size: {batch_size}, Current length: {current_length}, Initial: {self.initial_length}, Generated: {tokens_generated}")
-            if tokens_generated > 0:
-                print(f"Last generated tokens: {input_ids[:, -min(tokens_generated, 5):]}")
-        
+
         # If we already generated one or more tokens, force EOS
         if tokens_generated >= 1:
-            if self.debug:
-                print(f"Forcing EOS after {tokens_generated} token(s)")
             scores.fill_(-float('inf'))
             scores[:, self.tokenizer.eos_token_id] = 1e4
             return scores
             
-        # First generation step: only allow YES or NO (not EOS yet)
+        # First generation step: only allow the two decision tokens (not EOS yet)
         pos_tokens = self.tokenized_pos
         neg_tokens = self.tokenized_neg
-        
-        if self.debug:
-            print(f"First generation - allowing only YES ({pos_tokens[0]}) or NO ({neg_tokens[0]})")
-            print(f"EOS token ID: {self.tokenizer.eos_token_id}")
-        
-        # Extract original logits for yes/no
+
+        # Extract original logits for the two decision tokens
         pos_neg_logits = scores[:, [pos_tokens[0], neg_tokens[0]]]
-        
-        if self.debug:
-            print(f"Pos/Neg logits: {pos_neg_logits}")
-        
+
         # Get probabilities using softmax
         pos_neg_probs = torch.nn.functional.softmax(pos_neg_logits, dim=-1)
         
@@ -209,11 +189,7 @@ class PosNegLogitsProcessor(LogitsProcessor):
         
         # Store probabilities for later retrieval (convert to CPU and list)
         self.last_probabilities = list(zip(pos_prob.cpu().tolist(), neg_prob.cpu().tolist()))
-        
-        if self.debug:
-            print(f"Positive prob: {pos_prob}")
-            print(f"Negative prob: {neg_prob}")
-        
+
         # Mask all tokens with -inf
         scores.fill_(-float('inf'))
         

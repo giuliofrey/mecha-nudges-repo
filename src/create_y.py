@@ -266,7 +266,6 @@ def create_y(
             # Extract payload (label-based, for prompting) and payload_original (original column names)
             payload = {label: record.get(column, "") for label, column in variable_mappings}
             payload_original = {column: record.get(column, "") for _, column in variable_mappings}
-            renamed_columns = {label: record.get(column, "") for label, column in variable_mappings}
 
             # Truncate item_details if it exceeds maximum length
             if 'item_details' in payload:
@@ -283,8 +282,7 @@ def create_y(
                     else:
                         payload['item_details'] = truncated
 
-            records.append({"id": record_id, "payload": payload, "payload_original": payload_original,
-                            "renamed_columns": renamed_columns})
+            records.append({"id": record_id, "payload": payload, "payload_original": payload_original})
             payload_originals.append(payload)
 
             # Process batch when full
@@ -306,7 +304,7 @@ def create_y(
                         "payload": meta["payload"],
                         "payload_original": meta["payload_original"],
                     }
-                    output_record.update(meta["renamed_columns"])
+
                     out_file.write(json.dumps(output_record) + "\n")
 
                     if decision is True:
@@ -339,7 +337,6 @@ def create_y(
                     "payload": meta["payload"],
                     "payload_original": meta["payload_original"],
                 }
-                output_record.update(meta["renamed_columns"])
                 out_file.write(json.dumps(output_record) + "\n")
 
                 if decision is True:
@@ -373,7 +370,7 @@ def main() -> None:
     parser.add_argument("--input-length", type=int, required=True, help="Number of rows in the input JSONL file.")
     parser.add_argument(
         "--variable", required=True, nargs="+",
-        help="Mapping(s) for prompt variables (e.g. Title=title Description=description).",
+        help="Mapping(s) for prompt variables (e.g. Title=title Item_Details=item_details).",
     )
     parser.add_argument("--positive-token", required=True, help="Token treated as positive decision.")
     parser.add_argument("--negative-token", required=True, help="Token treated as negative decision.")
