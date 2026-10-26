@@ -33,7 +33,7 @@ where `y` is the gold label (SELECT/PASS) and `P` comes from fine-tuned classifi
 
 2. **Class Balancing** (`src/balance_labels.py`): Undersample the majority class to create equal positive/negative representation. Raw label distributions are highly imbalanced (~16% positive pre-ChatGPT, ~5% post-ChatGPT with GPT-5-mini); balancing ensures fine-tuned models learn the content–label relationship rather than just the base rate.
 
-3. **Fine-Tuning** (`src/finetuning.py`): LoRA fine-tune a classifier (Llama-3.1-8B) on the balanced labels. A second "null" model trained on empty text establishes the baseline entropy H(Y|empty). Separate model pairs are trained for each time period.
+3. **Fine-Tuning** (`src/finetuning.py`): LoRA fine-tune a classifier (Llama-3.1-8B-Instruct) on the balanced labels. A second "null" model trained on empty text establishes the baseline entropy H(Y|empty). Separate model pairs are trained for each time period.
 
 4. **V-Information** (`src/v_info.py`): Compute PVI = H(Y|empty) - H(Y|text) for each listing using the fine-tuned models.
 
@@ -96,11 +96,11 @@ The paper tests robustness across several dimensions:
 |-----------|---------|-------------|
 | Token pair | SELECT/PASS | YES/NO, BUY/SKIP, PICK/PASS |
 | Prompt | V4 (descriptive) | V1 (minimal), V2 (clarified), V3 (indirect) |
-| Labeling model | GPT-5-mini | Gemma-3-27B, Qwen3-32B |
-| Fine-tuning model | Llama-3.1-8B | Qwen3-8B, Gemma-3-12B |
+| Labeling model | GPT-5-mini | Gemma-3-27B-IT, Qwen3-32B |
+| Fine-tuning model | Llama-3.1-8B-Instruct | Qwen3-8B, Gemma-3-12B |
 | Seed | 42 | 123, 456, 789, 1024 |
 
-The paper also includes placebo and robustness analyses not covered by this repository:
+The paper also reports the following analyses. They are described there, but their code is not included in this repository:
 
 - **DailyMed placebo**: The same pipeline is applied to pharmaceutical drug labels (which should be unaffected by ChatGPT) as a temporal control.
 - **Rephrasing placebo**: Pre-ChatGPT listings are rephrased with GPT-5-mini to test whether the PVI increase reflects general LLM-style text rather than mecha-nudging.
